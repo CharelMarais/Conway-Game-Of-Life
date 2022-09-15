@@ -3,7 +3,7 @@ let gridSize = 50;
 let tickSpeed = 300;
 let state = 0;
 
-// Outerloop to create rows
+// Outer loop to create rows
 for (let rows = 0; rows < gridSize; rows++) {
   const conRow = document.createElement('div');
   conRow.id = `con-row${rows + 1}`;
@@ -43,7 +43,7 @@ function conwayBoxClicked(row, column) {
 // Checking all div with the class .conway-box
 const gridBoxes = document.querySelectorAll('.conway-box');
 
-// Function to check click event on the
+// Function to check click event on the grid
 gridBoxes.forEach((box) => {
   box.addEventListener('click', () => {
     // get the info on what block was clicked
@@ -65,7 +65,6 @@ gridBoxes.forEach((box) => {
 
 // Button initializations
 const startButton = document.getElementById('start');
-//const resetButton = document.getElementById('reset');
 const stopButton = document.getElementById('stop');
 let tickSpeedSet;
 
@@ -73,7 +72,7 @@ let tickSpeedSet;
 startButton.addEventListener('click', function () {
   let i = 0;
   if (state === 0) {
-    tickSpeedSet = setInterval(ruleOneConway, tickSpeed, grid);
+    tickSpeedSet = setInterval(rulesConway, tickSpeed, grid);
     state = 1;
   }
 });
@@ -86,22 +85,12 @@ stopButton.addEventListener('click', function () {
   }
 });
 
-// resetButton.addEventListener('click', function () {
-//   for (let row = 0; row < gridSize; row++) {
-//     const rowOfBooleans = [];
-//     for (let col = 0; col < gridSize; col++) {
-//       rowOfBooleans.push(false);
-//     }
-//     grid.push(rowOfBooleans);
-//   }
-// });
-
 // Each cell with one or no neighbors dies, as if by solitude.
 // Each cell with four or more neighbors dies, as if by overpopulation.
 // Each cell with two or three neighbors survives.
 // Unpopulated: Each cell with three neighbors becomes populated.
 
-function ruleOneConway(grid) {
+function rulesConway(grid) {
   const tempGrid = JSON.parse(JSON.stringify(grid));
 
   for (let row = 0; row < gridSize; row++) {
@@ -129,7 +118,7 @@ function ruleOneConway(grid) {
   }
 }
 
-//Function to check how may areas around the center
+//Function to check how may areas around the center are alive
 function countPartnersAroundPoint(tempGrid, row, col) {
   let count = 0;
 
