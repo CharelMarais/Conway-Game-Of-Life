@@ -1,5 +1,7 @@
 // Create grid size
-let gridSize = 20;
+let gridSize = 50;
+let tickSpeed = 50;
+let state = 0;
 
 // Outerloop to create rows
 for (let rows = 0; rows < gridSize; rows++) {
@@ -34,16 +36,8 @@ function conwayBoxClicked(row, column) {
   grid[row][column] = !grid[row][column];
   const boxToChange = document.getElementById(`boxR${row + 1}C${column + 1}`);
   boxToChange.style.backgroundColor = grid[row][column]
-    ? 'yellow'
-    : 'rgb(171, 171, 171)';
-}
-
-// Function to swap just the color depending on what was inserted
-function conwayBoxSwitch(row, column) {
-  const boxToChange = document.getElementById(`boxR${row + 1}C${column + 1}`);
-  boxToChange.style.backgroundColor = grid[row][column]
-    ? 'yellow'
-    : 'rgb(171, 171, 171)';
+    ? 'white'
+    : 'rgb(6, 6, 6)';
 }
 
 // Checking all div with the class .conway-box
@@ -65,19 +59,42 @@ gridBoxes.forEach((box) => {
     );
 
     conwayBoxClicked(Number(boxRow) - 1, Number(boxColumn) - 1);
-    console.log(box.id, boxRow, boxColumn);
+    console.log(box.id);
   });
 });
 
+// Button initializations
 const startButton = document.getElementById('start');
-startButton.addEventListener('click', oneStep);
+//const resetButton = document.getElementById('reset');
+const stopButton = document.getElementById('stop');
+let tickSpeedSet;
 
-function oneStep() {
-  ruleOneConway(grid);
-  //setInterval(ruleOneConway, 1000, grid);
-}
+// Start button
+startButton.addEventListener('click', function () {
+  let i = 0;
+  if (state === 0) {
+    tickSpeedSet = setInterval(ruleOneConway, tickSpeed, grid);
+    state = 1;
+  }
+});
 
-//setInterval(ruleOneConway, 5000, grid);
+// Stop button
+stopButton.addEventListener('click', function () {
+  if (state === 1) {
+    clearInterval(tickSpeedSet);
+    state = 0;
+  }
+});
+
+// resetButton.addEventListener('click', function () {
+//   for (let row = 0; row < gridSize; row++) {
+//     const rowOfBooleans = [];
+//     for (let col = 0; col < gridSize; col++) {
+//       rowOfBooleans.push(false);
+//     }
+//     grid.push(rowOfBooleans);
+//   }
+// });
 
 // Each cell with one or no neighbors dies, as if by solitude.
 // Each cell with four or more neighbors dies, as if by overpopulation.
@@ -89,105 +106,69 @@ function ruleOneConway(grid) {
 
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
-      console.log(row, ' ', col);
       if (
         tempGrid[row][col] === true &&
-        countPartnersAroundPoint(grid, row, col) <= 1
+        countPartnersAroundPoint(tempGrid, row, col) <= 1
       ) {
+        //Rule 1
         conwayBoxClicked(row, col);
       } else if (
         tempGrid[row][col] === true &&
-        countPartnersAroundPoint(grid, row, col) >= 4
+        countPartnersAroundPoint(tempGrid, row, col) >= 4
       ) {
+        //Rule 2
         conwayBoxClicked(row, col);
       } else if (
         tempGrid[row][col] === false &&
-        countPartnersAroundPoint(grid, row, col) === 3
+        countPartnersAroundPoint(tempGrid, row, col) === 3
       ) {
+        //Rule 4
         conwayBoxClicked(row, col);
       }
-      //if (tempGrid[row][col] === true) {
-      //conwayBoxClicked(row, col);
-      //conwayBoxClicked(row, col + 1);
-      //}
     }
   }
 }
 
 //Function to check how may areas around the center
-function countPartnersAroundPoint(grid, row, col) {
+function countPartnersAroundPoint(tempGrid, row, col) {
   let count = 0;
 
   if (row === 0 && col === 0) {
     // top-left
-    if (grid[row][col + 1] === true) {
+    if (tempGrid[row][col + 1] === true) {
       count++;
     }
 
-    for (i = 1; i < 3; i++) {
-      if (grid[row + 1][col - 1 + i] === true) {
+    for (i = 0; i < 2; i++) {
+      if (tempGrid[row + 1][col + i] === true) {
         count++;
       }
     }
   } else if (row === 0 && col === gridSize - 1) {
     // Top-Right
     if (row === 0 && col === 0) {
-      if (grid[row][col - 1] === true) {
+      if (tempGrid[row][col - 1] === true) {
         count++;
       }
 
       for (i = 0; i < 2; i++) {
-        if (grid[row + 1][col - 1 + i] === true) {
+        if (tempGrid[row + 1][col - 1 + i] === true) {
           count++;
         }
       }
     }
   } else if (row === 0) {
     // Top-Row
-    if (grid[row][col - 1] === true) {
+    if (tempGrid[row][col - 1] === true) {
       count++;
     }
 
-    if (grid[row][col + 1] === true) {
+    if (tempGrid[row][col + 1] === true) {
       count++;
     }
 
     for (i = 0; i < 3; i++) {
-      if (grid[row + 1][col - 1 + i] === true) {
-        count++;
-      }
-    }
-  } else if (col === 0) {
-    // Left-Column
-    for (i = 0; i < 2; i++) {
-      if (grid[row - 1][col + i] === true) {
-        count++;
-      }
-    }
-
-    if (grid[row][col + 1] === true) {
-      count++;
-    }
-
-    for (i = 0; i < 2; i++) {
-      if (grid[row + 1][col + i] === true) {
-        count++;
-      }
-    }
-  } else if (col === gridSize - 1) {
-    // Right-Column
-    for (i = 0; i < 2; i++) {
-      if (grid[row - 1][col - 1 + i] === true) {
-        count++;
-      }
-    }
-
-    if (grid[row][col - 1] === true) {
-      count++;
-    }
-
-    for (i = 0; i < 2; i++) {
-      if (grid[row + 1][col - 1 + i] === true) {
+      if (tempGrid[row + 1][col - 1 + i] === true) {
         count++;
       }
     }
@@ -195,55 +176,89 @@ function countPartnersAroundPoint(grid, row, col) {
     //Bottom-left
 
     for (i = 0; i < 2; i++) {
-      if (grid[row - 1][col + i] === true) {
+      if (tempGrid[row - 1][col + i] === true) {
         count++;
       }
     }
 
-    if (grid[row][col + 1] === true) {
+    if (tempGrid[row][col + 1] === true) {
       count++;
     }
   } else if (row === gridSize - 1 && col === gridSize - 1) {
     //Bottom-Right
     for (i = 0; i < 2; i++) {
-      if (grid[row - 1][col - 1 + i] === true) {
+      if (tempGrid[row - 1][col - 1 + i] === true) {
         count++;
       }
     }
 
-    if (grid[row][col - 1] === true) {
+    if (tempGrid[row][col - 1] === true) {
       count++;
+    }
+  } else if (col === 0) {
+    // Left-Column
+    for (i = 0; i < 2; i++) {
+      if (tempGrid[row - 1][col + i] === true) {
+        count++;
+      }
+    }
+
+    if (tempGrid[row][col + 1] === true) {
+      count++;
+    }
+
+    for (i = 0; i < 2; i++) {
+      if (tempGrid[row + 1][col + i] === true) {
+        count++;
+      }
+    }
+  } else if (col === gridSize - 1) {
+    // Right-Column
+    for (i = 0; i < 2; i++) {
+      if (tempGrid[row - 1][col - 1 + i] === true) {
+        count++;
+      }
+    }
+
+    if (tempGrid[row][col - 1] === true) {
+      count++;
+    }
+
+    for (i = 0; i < 2; i++) {
+      if (tempGrid[row + 1][col - 1 + i] === true) {
+        count++;
+      }
     }
   } else if (row === gridSize - 1) {
     //Bottom-Row
     for (i = 0; i < 3; i++) {
-      if (grid[row - 1][col - 1 + i] === true) {
+      if (tempGrid[row - 1][col - 1 + i] === true) {
         count++;
       }
     }
-    if (grid[row][col - 1] === true) {
+    if (tempGrid[row][col - 1] === true) {
       count++;
     }
-    if (grid[row][col + 1] === true) {
+    if (tempGrid[row][col + 1] === true) {
       count++;
     }
   } else {
     for (i = 0; i < 3; i++) {
-      if (grid[row - 1][col - 1 + i] === true) {
+      if (tempGrid[row - 1][col - 1 + i] === true) {
         count++;
       }
     }
 
-    if (grid[row][col - 1] === true) {
+    if (tempGrid[row][col - 1] === true) {
       count++;
     }
 
-    if (grid[row][col + 1] === true) {
+    if (tempGrid[row][col + 1] === true) {
       count++;
     }
 
     for (i = 0; i < 3; i++) {
-      if (grid[row + 1][col - 1 + i] === true) {
+      if (tempGrid[row + 1][col - 1 + i] === true) {
         count++;
       }
     }
