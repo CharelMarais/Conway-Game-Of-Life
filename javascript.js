@@ -1,6 +1,6 @@
 // Create grid size
 let gridSize = 50;
-let tickSpeed = 50;
+let tickSpeed = 300;
 let state = 0;
 
 // Outerloop to create rows
